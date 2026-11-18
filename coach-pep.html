@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pep: Spotter e Ingeniero de Carrera · IdoRacing Analytics</title>
+  <meta name="description" content="Guía de Pep, el spotter de radio y asistente técnico offline de IdoRacing: avisos de frenada, velocidad de vértice y debriefing de stint.">
+  <link rel="canonical" href="https://idoracing.github.io/coach-pep.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://idoracing.github.io/coach-pep.html">
+  <meta property="og:title" content="Pep: Spotter e Ingeniero de Carrera · IdoRacing Analytics">
+  <meta property="og:description" content="Avisos acústicos en directo por radio a 250m de curva sin apartar los ojos de la trazada. 100% offline y sin suscripciones.">
+
+  <!-- Google Fonts & Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Racing+Sans+One&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00D2BE',
+            'brand-light': '#33FFEA',
+            accent: '#E10600',
+            comp: '#A814FF',
+            gain: '#00E676',
+            loss: '#FF1744',
+            'night-1': '#08090C',
+            'night-2': '#0A0C10',
+            'night-3': '#0A0C12',
+            'night-4': '#0B0D14',
+            'night-5': '#0C101A',
+            'night-6': '#0E121B',
+            'night-7': '#0E131E',
+            'night-8': '#121622',
+            borderDark: '#1E2638'
+          },
+          fontFamily: {
+            sans: ['"Titillium Web"', 'sans-serif'],
+            telemetry: ['"JetBrains Mono"', 'monospace'],
+            brand: ['"Racing Sans One"', '"Titillium Web"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #08090C; color: #E2E8F0; font-family: 'Titillium Web', sans-serif; }
+    .font-telemetry { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    .font-brand { font-family: 'Racing Sans One', sans-serif; letter-spacing: -0.02em; }
+    .carbon-bg { background-color: #08090C; background-image: radial-gradient(rgba(30, 38, 56, 0.4) 1px, transparent 0); background-size: 24px 24px; }
+  </style>
+</head>
+<body class="carbon-bg min-h-screen flex flex-col selection:bg-brand selection:text-black">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-borderDark bg-[#0A0C12]/95 backdrop-blur-md sticky top-0 z-50 px-4 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2.5 shrink-0 group">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-accent via-[#C00000] to-[#121824] text-white font-bold shadow-md border border-accent/40 group-hover:scale-105 transition-transform">
+          <span class="font-brand text-sm italic tracking-tighter">IR</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-brand text-lg tracking-wider text-white font-black italic">IDORACING</span>
+            <span class="text-xs font-bold text-brand font-telemetry tracking-widest uppercase">ANALYTICS</span>
+          </div>
+          <span class="text-[9px] text-gray-400 font-telemetry -mt-0.5">Telemetría y Asistencia Técnica · SimRacing</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 bg-night-8 p-1 rounded-xl border border-white/5 text-xs font-semibold">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Inicio</a>
+        <a href="methodology.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">¿Cómo ayuda a mejorar?</a>
+        <a href="hud.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">HUD Pedales</a>
+        <a href="launcher.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Launcher & Config</a>
+        <a href="coach-pep.html" class="px-3 py-1.5 rounded-lg text-brand bg-brand/10 border border-brand/20 transition">Pep Spotter</a>
+        <a href="index.html#download" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Descargas</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <a href="https://github.com/idoracing/idoracing" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-night-8 hover:bg-[#1A2030] text-gray-200 border border-borderDark text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span class="hidden sm:inline">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-4xl mx-auto px-4 py-10 space-y-12">
+
+    <!-- Title & Context -->
+    <div class="space-y-3">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-telemetry">
+        <span>RADIO DE PISTA OFFLINE</span>
+        <span>·</span>
+        <span>AVISOS A 250 METROS</span>
+        <span>·</span>
+        <span>INGENIERO EN GARAGE</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black font-brand italic text-white tracking-wide">
+        Pep: Tu Spotter e Ingeniero de Pista en la Radio
+      </h1>
+      <p class="text-base text-gray-400 leading-relaxed font-sans">
+        A 250 km/h en Spa o Nürburgring no puedes apartar los ojos del punto de frenada para mirar números en una pantalla. Pep te habla directamente por radio como un copiloto profesional.
+      </p>
+    </div>
+
+    <!-- Core Value Pillars -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <div class="p-5 rounded-xl bg-night-6 border border-borderDark space-y-3">
+        <div class="w-9 h-9 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center text-brand font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-white font-sans">Cero Distracción Visual</h3>
+        <p class="text-xs text-gray-400 leading-relaxed">
+          Los avisos son de audio puro por tus auriculares. Mantén el 100% de tu concentración en los carteles de metro, los bordillos y el tráfico de carrera.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-xl bg-night-6 border border-borderDark space-y-3">
+        <div class="w-9 h-9 rounded-lg bg-gain/10 border border-gain/20 flex items-center justify-center text-gain font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-white font-sans">Avisos a 250 Metros</h3>
+        <p class="text-xs text-gray-400 leading-relaxed">
+          Pep calcula tu velocidad y distancia en pista para emitir la recomendación justo antes de que llegues a la zona de frenada o al punto ciego de la curva.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-xl bg-night-6 border border-borderDark space-y-3">
+        <div class="w-9 h-9 rounded-lg bg-comp/10 border border-comp/20 flex items-center justify-center text-comp font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-white font-sans">100% Offline y Privado</h3>
+        <p class="text-xs text-gray-400 leading-relaxed">
+          Funciona de forma autónoma con los clips pregrabados del repositorio. Cero latencia de red, sin depender de servicios en la nube caídos y con tu backend apagado.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- Radio Spotter In-Action Examples -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold font-brand italic text-white">
+        Qué te dice Pep en Pista: Ejemplos Reales
+      </h2>
+
+      <div class="space-y-3 font-telemetry text-xs">
+        
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark flex items-start gap-3">
+          <span class="px-2 py-0.5 rounded bg-loss/10 text-loss font-bold uppercase shrink-0">Frenada</span>
+          <div>
+            <p class="text-white font-semibold">"Curva 1: Frenaste 8 metros antes de tu referencia"</p>
+            <p class="text-gray-400 mt-0.5">Te avisa de que has sido conservador en la frenada y has cedido casi dos décimas en la aproximación.</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark flex items-start gap-3">
+          <span class="px-2 py-0.5 rounded bg-brand/10 text-brand font-bold uppercase shrink-0">Vértice</span>
+          <div>
+            <p class="text-white font-semibold">"Buena rotación en apex, velocidad mínima +4 km/h"</p>
+            <p class="text-gray-400 mt-0.5">Confirma que la descompresión progresiva del freno metió el morro en el vértice sin arrastrar neumáticos.</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark flex items-start gap-3">
+          <span class="px-2 py-0.5 rounded bg-yellow-400/10 text-yellow-400 font-bold uppercase shrink-0">Presiones</span>
+          <div>
+            <p class="text-white font-semibold">"Atención: Presión delantera izquierda subiendo a 27.3 psi"</p>
+            <p class="text-gray-400 mt-0.5">En Assetto Corsa Competizione la ventana óptima es de 26.5 a 27.0 psi. Superar los 27.1 psi reduce la huella de contacto y causa sobrecalentamiento.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Post-Stint Debriefing (Garage) -->
+    <section class="p-6 rounded-2xl bg-night-6 border border-borderDark space-y-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-brand font-telemetry text-sm font-bold">// INGENIERO EN EL BOX</span>
+        <span class="text-gray-600">·</span>
+        <h2 class="text-lg font-bold text-white font-brand italic">
+          Debriefing de Stint al volver al Garaje
+        </h2>
+      </div>
+
+      <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+        Al terminar tu tanda y entrar en el pit-lane, puedes pedirle a Pep un resumen ejecutivo de tu sesión. Pep analiza todas las curvas de tu mejor vuelta frente a la vuelta óptima teórica y te resume en lenguaje natural los puntos clave donde ganar tiempo:
+      </p>
+
+      <blockquote class="p-4 rounded-xl bg-night-8 border-l-2 border-brand text-xs sm:text-sm text-gray-300 italic font-sans leading-relaxed">
+        "Has completado 12 vueltas. Tu mejor tiempo ha sido 2:18.420, pero tu vuelta teórica por sectores es 2:17.810. La mayor pérdida está concentrada en Les Combes (-0.28s por acantilado de freno soltando de golpe) y en Blanchimont (-0.15s por levantar gas innecesariamente al 85%). Con corregir el trail braking en la T7 tienes medio segundo garantizado."
+      </blockquote>
+
+      <p class="text-xs text-gray-400 font-telemetry">
+        Soporte para modelos locales en tu PC con <strong>Ollama</strong> (DeepSeek-R1, Llama 3) para mantener el 100% de tus datos privados, o conectores para APIs remotas.
+      </p>
+    </section>
+
+    <!-- Controls & Hotkeys -->
+    <section class="space-y-3">
+      <h2 class="text-xl font-bold font-brand italic text-white">
+        Controles de Pep
+      </h2>
+      <div class="p-4 rounded-xl bg-night-6 border border-borderDark text-xs font-telemetry text-gray-300 space-y-2">
+        <p><strong class="text-white">Tecla de Mute instantáneo:</strong> Pulsa <kbd class="px-2 py-0.5 rounded bg-night-8 border border-white/10 text-brand">M</kbd> en cualquier momento para silenciar o reactivar la voz de Pep durante la tanda.</p>
+        <p><strong class="text-white">Ajuste de Volumen:</strong> Configurable desde el panel web de IdoRacing o en <code class="text-gray-300">idoracing-launcher.json</code> bajo la clave <code class="text-brand">audio.volume</code>.</p>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation CTA -->
+    <div class="pt-8 border-t border-borderDark/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <a href="launcher.html" class="text-xs text-brand hover:text-brand-light font-semibold flex items-center gap-1.5 transition">
+        <span>&larr; Ver guía de IdoRacing Launcher</span>
+      </a>
+      <a href="methodology.html" class="px-4 py-2 rounded-xl bg-night-8 hover:bg-night-6 border border-borderDark text-xs font-bold text-white transition flex items-center gap-2">
+        <span>Metodología de Pilotaje e Ingeniería &rarr;</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-borderDark bg-[#05070B] py-8 px-4 text-xs text-gray-500 font-telemetry mt-auto">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-brand text-sm italic text-white font-bold">IDORACING</span>
+        <span>·</span>
+        <span>Código Abierto bajo Licencia MIT</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/idoracing/idoracing" class="hover:text-brand transition">GitHub</a>
+        <a href="https://github.com/idoracing/idoracing/releases" class="hover:text-brand transition">Releases</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

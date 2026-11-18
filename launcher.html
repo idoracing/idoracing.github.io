@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IdoRacing Launcher y Configuración · IdoRacing Analytics</title>
+  <meta name="description" content="Guía completa del supervisor nativo idoracing-launcher, archivo de configuración idoracing-launcher.json y parámetros de lanzamiento.">
+  <link rel="canonical" href="https://idoracing.github.io/launcher.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://idoracing.github.io/launcher.html">
+  <meta property="og:title" content="IdoRacing Launcher y Configuración · IdoRacing Analytics">
+  <meta property="og:description" content="Aprende a configurar el supervisor central de IdoRacing: toggles de subsistemas, flags de terminal e integración con Steam.">
+
+  <!-- Google Fonts & Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Racing+Sans+One&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00D2BE',
+            'brand-light': '#33FFEA',
+            accent: '#E10600',
+            comp: '#A814FF',
+            gain: '#00E676',
+            loss: '#FF1744',
+            'night-1': '#08090C',
+            'night-2': '#0A0C10',
+            'night-3': '#0A0C12',
+            'night-4': '#0B0D14',
+            'night-5': '#0C101A',
+            'night-6': '#0E121B',
+            'night-7': '#0E131E',
+            'night-8': '#121622',
+            borderDark: '#1E2638'
+          },
+          fontFamily: {
+            sans: ['"Titillium Web"', 'sans-serif'],
+            telemetry: ['"JetBrains Mono"', 'monospace'],
+            brand: ['"Racing Sans One"', '"Titillium Web"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #08090C; color: #E2E8F0; font-family: 'Titillium Web', sans-serif; }
+    .font-telemetry { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    .font-brand { font-family: 'Racing Sans One', sans-serif; letter-spacing: -0.02em; }
+    .carbon-bg { background-color: #08090C; background-image: radial-gradient(rgba(30, 38, 56, 0.4) 1px, transparent 0); background-size: 24px 24px; }
+  </style>
+</head>
+<body class="carbon-bg min-h-screen flex flex-col selection:bg-brand selection:text-black">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-borderDark bg-[#0A0C12]/95 backdrop-blur-md sticky top-0 z-50 px-4 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2.5 shrink-0 group">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-accent via-[#C00000] to-[#121824] text-white font-bold shadow-md border border-accent/40 group-hover:scale-105 transition-transform">
+          <span class="font-brand text-sm italic tracking-tighter">IR</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-brand text-lg tracking-wider text-white font-black italic">IDORACING</span>
+            <span class="text-xs font-bold text-brand font-telemetry tracking-widest uppercase">ANALYTICS</span>
+          </div>
+          <span class="text-[9px] text-gray-400 font-telemetry -mt-0.5">Telemetría y Asistencia Técnica · SimRacing</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 bg-night-8 p-1 rounded-xl border border-white/5 text-xs font-semibold">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Inicio</a>
+        <a href="methodology.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">¿Cómo ayuda a mejorar?</a>
+        <a href="hud.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">HUD Pedales</a>
+        <a href="launcher.html" class="px-3 py-1.5 rounded-lg text-brand bg-brand/10 border border-brand/20 transition">Launcher & Config</a>
+        <a href="coach-pep.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Pep Spotter</a>
+        <a href="index.html#download" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Descargas</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <a href="https://github.com/idoracing/idoracing" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-night-8 hover:bg-[#1A2030] text-gray-200 border border-borderDark text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span class="hidden sm:inline">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-4xl mx-auto px-4 py-10 space-y-12">
+
+    <!-- Title & Context -->
+    <div class="space-y-3">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-telemetry">
+        <span>SUPERVISOR UNIFICADO</span>
+        <span>·</span>
+        <span>ZERO-OVERHEAD</span>
+        <span>·</span>
+        <span>AUTO-ARRANQUE STEAM</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black font-brand italic text-white tracking-wide">
+        IdoRacing Launcher y Sistema de Configuración
+      </h1>
+      <p class="text-base text-gray-400 leading-relaxed font-sans">
+        <code class="text-brand font-telemetry">idoracing-launcher</code> es el supervisor central nativo en Go encargado de orquestar todos los componentes de pista (grabador, HUD de pedales, spotter de radio y luces de volante Moza) con un único proceso ligero.
+      </p>
+    </div>
+
+    <!-- The 4 Subsystems Breakdown -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold font-brand italic text-white">
+        Los 4 Subsistemas del Launcher
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">pep_spotter</span>
+            <span class="text-[10px] font-telemetry px-2 py-0.5 rounded bg-gain/10 text-gain font-bold">Activo por defecto</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Spotter de pista que reproduce clips de radio offline a 250m de curva. Informa de deltas de frenada, velocidad de vértice y advertencias de presiones de neumáticos.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">hud_overlay</span>
+            <span class="text-[10px] font-telemetry px-2 py-0.5 rounded bg-gain/10 text-gain font-bold">Activo por defecto</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Ventana nativa transparente en X11/Win32 que proyecta el osciloscopio de pedales y el indicador visual de trail braking en tiempo real sobre el juego.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">moza_shift_lights</span>
+            <span class="text-[10px] font-telemetry px-2 py-0.5 rounded bg-gain/10 text-gain font-bold">Activo por defecto</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Conexión CDC-ACM directa con bases Moza (R5, R9, R12, R16, R21) en Linux para encender la tira de LEDs de RPM y destello de cambio sin necesidad de Pit House.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">recorder</span>
+            <span class="text-[10px] font-telemetry px-2 py-0.5 rounded bg-gain/10 text-gain font-bold">Activo por defecto</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Grabador binario a 50Hz que captura las vueltas completas y almacena la física en archivos CSV/SQLite sin interferir con el hilo de renderizado del simulador.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Configuration File Schema -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold font-brand italic text-white">
+          Archivo de Configuración: idoracing-launcher.json
+        </h2>
+        <span class="text-xs text-brand font-telemetry">100% retrocompatible</span>
+      </div>
+
+      <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+        El launcher busca automáticamente su archivo de configuración en un orden jerárquico estricto:
+      </p>
+
+      <ol class="list-decimal list-inside space-y-1 text-xs text-gray-300 font-telemetry bg-night-8 p-3 rounded-xl border border-white/5">
+        <li>Directorio actual de ejecución (<code class="text-white">./idoracing-launcher.json</code>)</li>
+        <li>Subdirectorio de datos (<code class="text-white">data/idoracing-launcher.json</code>)</li>
+        <li>Directorio de configuración del usuario (<code class="text-white">~/.config/idoracing/</code> en Linux o <code class="text-white">%APPDATA%\idoracing\</code> en Windows)</li>
+        <li><strong class="text-brand">Modo a prueba de fallos:</strong> Si no existe ningún archivo, arranca con valores por defecto seguros en memoria sin fallar ni corromper nada.</li>
+      </ol>
+
+      <div class="rounded-xl overflow-hidden border border-borderDark bg-[#0A0D14]">
+        <div class="px-4 py-2 bg-night-8 border-b border-borderDark flex items-center justify-between text-xs font-telemetry">
+          <span class="text-gray-300 font-semibold">idoracing-launcher.json</span>
+          <span class="text-gray-500">JSON</span>
+        </div>
+        <pre class="p-4 text-xs font-telemetry text-gray-200 overflow-x-auto leading-relaxed"><code>{
+  "subsystems": {
+    "pep_spotter": true,
+    "hud_overlay": true,
+    "moza_shift_lights": true,
+    "recorder": true
+  },
+  "hotkeys": {
+    "spotter_mute": "KeyM"
+  },
+  "audio": {
+    "volume": 85,
+    "language": "es"
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- CLI Session Overrides -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold font-brand italic text-white">
+        Parámetros por Terminal (Overrides de Sesión)
+      </h2>
+      <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+        Puedes anular cualquier subsistema temporalmente para una sesión concreta sin necesidad de editar el archivo JSON:
+      </p>
+
+      <div class="overflow-x-auto rounded-xl border border-borderDark bg-night-6">
+        <table class="w-full text-left text-xs font-telemetry">
+          <thead class="bg-night-8 border-b border-borderDark text-gray-400">
+            <tr>
+              <th class="p-3">Flag CLI</th>
+              <th class="p-3">Efecto</th>
+              <th class="p-3">Ejemplo de uso</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-borderDark/40 text-gray-300">
+            <tr>
+              <td class="p-3 font-mono text-brand font-bold">-no-hud</td>
+              <td class="p-3">Desactiva el overlay visual en pantalla (modo inmersivo)</td>
+              <td class="p-3 text-gray-400"><code>idoracing-launcher -no-hud</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-brand font-bold">-no-spotter</td>
+              <td class="p-3">Silencia por completo la radio de Pep durante la tanda</td>
+              <td class="p-3 text-gray-400"><code>idoracing-launcher -no-spotter</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-brand font-bold">-no-moza</td>
+              <td class="p-3">Desactiva el puente USB serie de luces Moza</td>
+              <td class="p-3 text-gray-400"><code>idoracing-launcher -no-moza</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-brand font-bold">-no-recorder</td>
+              <td class="p-3">Corre solo con HUD y luces sin escribir telemetría a disco</td>
+              <td class="p-3 text-gray-400"><code>idoracing-launcher -no-recorder</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-brand font-bold">-status</td>
+              <td class="p-3">Muestra un informe de diagnóstico y cierra de inmediato</td>
+              <td class="p-3 text-gray-400"><code>idoracing-launcher -status</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Steam Integration Guide -->
+    <section class="p-6 rounded-2xl bg-night-6 border border-borderDark space-y-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-brand font-telemetry text-sm font-bold">// INTEGRACIÓN CON STEAM</span>
+        <span class="text-gray-600">·</span>
+        <h2 class="text-lg font-bold text-white font-brand italic">
+          Arranque Automático al pulsar "Jugar" en Steam
+        </h2>
+      </div>
+
+      <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+        El launcher está diseñado para colocarse directamente en las <strong>Opciones de Lanzamiento de Steam</strong>. Cuando pulsas "Jugar" a Assetto Corsa Competizione o Le Mans Ultimate, Steam arranca primero el launcher y este ejecuta el juego limpiamente:
+      </p>
+
+      <div class="space-y-3 font-telemetry text-xs">
+        <div>
+          <span class="text-gray-400 font-semibold block mb-1">En Linux (Proton):</span>
+          <div class="p-3 rounded-lg bg-night-8 border border-white/5 text-brand flex items-center justify-between">
+            <code>gamemoderun ~/.local/bin/idoracing-launcher %command%</code>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-gray-400 font-semibold block mb-1">En Windows:</span>
+          <div class="p-3 rounded-lg bg-night-8 border border-white/5 text-brand flex items-center justify-between">
+            <code>"C:\Ruta\A\IdoRacing\idoracing-launcher.exe" %command%</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation CTA -->
+    <div class="pt-8 border-t border-borderDark/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <a href="hud.html" class="text-xs text-brand hover:text-brand-light font-semibold flex items-center gap-1.5 transition">
+        <span>&larr; Ver guía del HUD de Pedales</span>
+      </a>
+      <a href="coach-pep.html" class="px-4 py-2 rounded-xl bg-night-8 hover:bg-night-6 border border-borderDark text-xs font-bold text-white transition flex items-center gap-2">
+        <span>Guía de Pep Spotter & Radio en Pista &rarr;</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-borderDark bg-[#05070B] py-8 px-4 text-xs text-gray-500 font-telemetry mt-auto">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-brand text-sm italic text-white font-bold">IDORACING</span>
+        <span>·</span>
+        <span>Código Abierto bajo Licencia MIT</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/idoracing/idoracing" class="hover:text-brand transition">GitHub</a>
+        <a href="https://github.com/idoracing/idoracing/releases" class="hover:text-brand transition">Releases</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

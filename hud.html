@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HUD de Pedales y Trail Braking · IdoRacing Analytics</title>
+  <meta name="description" content="Osciloscopio en vivo a 50Hz para entrenar trail braking en simracing con cero consumo de CPU y soporte nativo X11/Windows.">
+  <link rel="canonical" href="https://idoracing.github.io/hud.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://idoracing.github.io/hud.html">
+  <meta property="og:title" content="HUD de Pedales y Trail Braking · IdoRacing Analytics">
+  <meta property="og:description" content="Osciloscopio en tiempo real a 50Hz para dominar el trail braking y la rotación en curva en ACC, LMU y AC EVO.">
+  <meta property="og:image" content="https://idoracing.github.io/screenshots/live-pedal-hud.png">
+
+  <!-- Google Fonts & Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Racing+Sans+One&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00D2BE',
+            'brand-light': '#33FFEA',
+            accent: '#E10600',
+            comp: '#A814FF',
+            gain: '#00E676',
+            loss: '#FF1744',
+            'night-1': '#08090C',
+            'night-2': '#0A0C10',
+            'night-3': '#0A0C12',
+            'night-4': '#0B0D14',
+            'night-5': '#0C101A',
+            'night-6': '#0E121B',
+            'night-7': '#0E131E',
+            'night-8': '#121622',
+            borderDark: '#1E2638'
+          },
+          fontFamily: {
+            sans: ['"Titillium Web"', 'sans-serif'],
+            telemetry: ['"JetBrains Mono"', 'monospace'],
+            brand: ['"Racing Sans One"', '"Titillium Web"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #08090C; color: #E2E8F0; font-family: 'Titillium Web', sans-serif; }
+    .font-telemetry { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    .font-brand { font-family: 'Racing Sans One', sans-serif; letter-spacing: -0.02em; }
+    .carbon-bg { background-color: #08090C; background-image: radial-gradient(rgba(30, 38, 56, 0.4) 1px, transparent 0); background-size: 24px 24px; }
+  </style>
+</head>
+<body class="carbon-bg min-h-screen flex flex-col selection:bg-brand selection:text-black">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-borderDark bg-[#0A0C12]/95 backdrop-blur-md sticky top-0 z-50 px-4 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2.5 shrink-0 group">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-accent via-[#C00000] to-[#121824] text-white font-bold shadow-md border border-accent/40 group-hover:scale-105 transition-transform">
+          <span class="font-brand text-sm italic tracking-tighter">IR</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-brand text-lg tracking-wider text-white font-black italic">IDORACING</span>
+            <span class="text-xs font-bold text-brand font-telemetry tracking-widest uppercase">ANALYTICS</span>
+          </div>
+          <span class="text-[9px] text-gray-400 font-telemetry -mt-0.5">Telemetría y Asistencia Técnica · SimRacing</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 bg-night-8 p-1 rounded-xl border border-white/5 text-xs font-semibold">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Inicio</a>
+        <a href="methodology.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">¿Cómo ayuda a mejorar?</a>
+        <a href="hud.html" class="px-3 py-1.5 rounded-lg text-brand bg-brand/10 border border-brand/20 transition">HUD Pedales</a>
+        <a href="launcher.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Launcher & Config</a>
+        <a href="coach-pep.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Pep Spotter</a>
+        <a href="index.html#download" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Descargas</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <a href="https://github.com/idoracing/idoracing" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-night-8 hover:bg-[#1A2030] text-gray-200 border border-borderDark text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span class="hidden sm:inline">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-4xl mx-auto px-4 py-10 space-y-12">
+
+    <!-- Hero Title & Context -->
+    <div class="space-y-3">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-telemetry">
+        <span>NATIVO EN GO</span>
+        <span>·</span>
+        <span>X11 / WIN32 GDI</span>
+        <span>·</span>
+        <span>&lt; 15 MB RAM</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black font-brand italic text-white tracking-wide">
+        HUD Flotante de Pedales y Trail Braking
+      </h1>
+      <p class="text-base text-gray-400 leading-relaxed font-sans">
+        Entrenar la descompresión progresiva del freno en tiempo real mientras ruedas en pista, sin caídas de FPS, sin Electron y sin navegadores en segundo plano.
+      </p>
+    </div>
+
+    <!-- Prominent Screenshot -->
+    <div class="rounded-2xl bg-night-6 border border-borderDark overflow-hidden shadow-2xl p-2 sm:p-3 space-y-3">
+      <div class="rounded-xl overflow-hidden bg-night-1 border border-borderDark/60 flex items-center justify-center">
+        <img src="screenshots/live-pedal-hud.png" alt="HUD de Pedales IdoRacing en Pista" class="w-full h-auto object-contain max-h-[500px]">
+      </div>
+      <div class="px-2 py-1 text-xs text-gray-400 font-telemetry flex items-center justify-between">
+        <span>Captura en vivo del HUD superpuesto en pantalla durante una tanda de entrenamiento.</span>
+        <span class="text-brand font-semibold">Tasa de refresco: 50Hz</span>
+      </div>
+    </div>
+
+    <!-- What it Shows: The 3 Core Sections -->
+    <section class="space-y-6">
+      <h2 class="text-xl sm:text-2xl font-bold font-brand italic text-white">
+        ¿Qué muestra el HUD exactamente en cada curva?
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Card 1 -->
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-loss/10 border border-loss/20 flex items-center justify-center text-loss font-telemetry font-bold text-xs">
+            BRK
+          </div>
+          <h3 class="text-sm font-bold text-white">Osciloscopio a 50Hz</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Dibuja la traza continua de acelerador (verde) y freno (rojo) de los últimos 2.5 segundos. Permite comprobar visualmente con el rabillo del ojo si la curva de frenada es suave o abrupta.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center text-brand font-telemetry font-bold text-xs">
+            TRL
+          </div>
+          <h3 class="text-sm font-bold text-white">Detección de Trail Braking</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Se ilumina dinámicamente cuando estás descompresionando el pedal entre el 60% y el 10% mientras giras el volante hacia el ápice, confirmando que la transferencia de masas delantera está activa.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-comp/10 border border-comp/20 flex items-center justify-center text-comp font-telemetry font-bold text-xs">
+            RAD
+          </div>
+          <h3 class="text-sm font-bold text-white">Estado de Radio & Pep</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Muestra el estado del spotter Pep (conectado, emitiendo o silenciado), el volumen de salida y la tecla de mute configurada (<code class="text-gray-300">KeyM</code>) para silenciarlo instantáneamente.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Why Trail Braking Matters (Physics & Pedagogy) -->
+    <section class="p-6 rounded-2xl bg-night-6 border border-borderDark space-y-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-brand font-telemetry text-sm font-bold">// TELEMETRÍA APLICADA</span>
+        <span class="text-gray-600">·</span>
+        <h2 class="text-lg font-bold text-white font-brand italic">
+          Por qué el "Acantilado de Freno" te hace perder décimas
+        </h2>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm text-gray-300 leading-relaxed">
+        <p>
+          El error número 1 de los simracers intermedios es el denominado <strong>"acantilado de freno" (brake cliff)</strong>: frenar al 100% en recta y soltar el pedal a 0% de golpe justo antes de girar el volante.
+        </p>
+        <p>
+          Al soltar el freno de golpe, la suspensión delantera se descomprime violentamente, el peso del coche se transfiere hacia atrás y los neumáticos delanteros pierden carga vertical. Resultado: <strong>subviraje instantáneo en la entrada de curva</strong>, obligando al piloto a girar más grados de volante y a esperar más tiempo para poder acelerar.
+        </p>
+        <p class="bg-night-8 p-3 rounded-xl border border-white/5 font-telemetry text-xs text-gray-300">
+          <span class="text-brand font-bold">Técnica correcta con el HUD:</span> Frena fuerte en línea recta (100% de presión) y conforme te aproximas al punto de giro, <em>libera el pedal progresivamente (80% &rarr; 50% &rarr; 20% &rarr; 5%)</em> mientras incrementas el ángulo de volante. El morro del coche pivotará sobre el eje delantero directamente hacia el vértice.
+        </p>
+      </div>
+    </section>
+
+    <!-- Controls & Hotkeys -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold font-brand italic text-white">
+        Atajos y Configuración Rápida
+      </h2>
+
+      <div class="overflow-x-auto rounded-xl border border-borderDark bg-night-6">
+        <table class="w-full text-left text-xs font-telemetry">
+          <thead class="bg-night-8 border-b border-borderDark text-gray-400">
+            <tr>
+              <th class="p-3">Acción</th>
+              <th class="p-3">Tecla por defecto</th>
+              <th class="p-3">Personalizable en</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-borderDark/40 text-gray-300">
+            <tr>
+              <td class="p-3 font-semibold text-white">Silenciar / Reactivar Pep</td>
+              <td class="p-3"><kbd class="px-2 py-0.5 rounded bg-night-8 border border-white/10 text-brand">M</kbd></td>
+              <td class="p-3 text-gray-400"><code>idoracing-launcher.json</code> &rarr; <code>spotter_mute</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Arrancar sin HUD (modo ciego)</td>
+              <td class="p-3 font-mono text-gray-400">-no-hud</td>
+              <td class="p-3 text-gray-400">Parámetro CLI del launcher</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Cambio de idioma (ES / EN)</td>
+              <td class="p-3 text-gray-400">Desde la web de IdoRacing</td>
+              <td class="p-3 text-gray-400">Guardado automáticamente en SQLite local</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation CTA -->
+    <div class="pt-8 border-t border-borderDark/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <a href="methodology.html" class="text-xs text-brand hover:text-brand-light font-semibold flex items-center gap-1.5 transition">
+        <span>&larr; Ver cómo ayuda IdoRacing a mejorar</span>
+      </a>
+      <a href="launcher.html" class="px-4 py-2 rounded-xl bg-night-8 hover:bg-night-6 border border-borderDark text-xs font-bold text-white transition flex items-center gap-2">
+        <span>Guía de IdoRacing Launcher & Configuración &rarr;</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-borderDark bg-[#05070B] py-8 px-4 text-xs text-gray-500 font-telemetry mt-auto">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-brand text-sm italic text-white font-bold">IDORACING</span>
+        <span>·</span>
+        <span>Código Abierto bajo Licencia MIT</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/idoracing/idoracing" class="hover:text-brand transition">GitHub</a>
+        <a href="https://github.com/idoracing/idoracing/releases" class="hover:text-brand transition">Releases</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

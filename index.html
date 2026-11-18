@@ -149,10 +149,11 @@
       <!-- Navigation Links -->
       <nav class="hidden md:flex items-center gap-1 bg-night-8 p-1 rounded-xl border border-white/5 text-xs font-semibold">
         <a href="#features" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_features">Características</a>
-        <a href="#sims" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_sims">Simuladores</a>
+        <a href="#improve" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_improve">¿Cómo mejora?</a>
         <a href="#hud" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_hud">HUD Pedales</a>
+        <a href="#launcher" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_launcher">Launcher & Pep</a>
+        <a href="#sims" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_sims">Simuladores</a>
         <a href="#download" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_download">Descargas</a>
-        <a href="#faq" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_faq">Preguntas</a>
       </nav>
 
       <!-- Right Controls: Language Selector & GitHub Link -->
@@ -342,6 +343,230 @@
           <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="f6_desc">
             Base de datos SQLite local en tu disco. Sin cuentas de usuario obligatorias, sin subir tus vueltas a servidores de terceros y 100% operativo sin conexión a internet.
           </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- How IdoRacing Helps You Improve Section -->
+  <section id="improve" class="py-14 px-4 border-t border-borderDark/40 bg-night-8/60">
+    <div class="max-w-5xl mx-auto space-y-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-brand font-telemetry uppercase tracking-wider" data-i18n="improve_tag">
+            METODOLOGÍA DE INGENIERÍA
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black font-brand italic text-white" data-i18n="improve_title">
+            ¿Cómo te ayuda IdoRacing a mejorar en pista?
+          </h2>
+          <p class="text-sm text-gray-400 max-w-2xl font-sans" data-i18n="improve_desc">
+            En lugar de abrumarte con 30 líneas de gráficas indescifrables, IdoRacing desglosa cada curva en 4 fases objetivas y te dice en metros y km/h exactamente dónde estás perdiendo tiempo.
+          </p>
+        </div>
+        <a href="methodology.html" class="px-4 py-2 rounded-xl bg-night-6 hover:bg-[#1E2738] border border-borderDark text-xs font-bold text-brand hover:text-brand-light transition shrink-0 flex items-center gap-1.5 self-start md:self-auto">
+          <span data-i18n="improve_link">Ver metodología completa &rarr;</span>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="w-6 h-6 rounded-md bg-loss/10 border border-loss/20 flex items-center justify-center text-loss font-telemetry text-xs font-bold">1</span>
+            <span class="text-[10px] font-telemetry text-gray-500 uppercase">Aproximación</span>
+          </div>
+          <h3 class="text-sm font-bold text-white font-sans" data-i18n="imp_phase1_title">Punto de Frenada</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="imp_phase1_desc">
+            Mide si frenas antes o después de tu referencia en metros reales. Frenar 8 metros antes en recta cede casi dos décimas antes de girar el volante.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="w-6 h-6 rounded-md bg-brand/10 border border-brand/20 flex items-center justify-center text-brand font-telemetry text-xs font-bold">2</span>
+            <span class="text-[10px] font-telemetry text-brand uppercase font-bold">Clave Técnica</span>
+          </div>
+          <h3 class="text-sm font-bold text-white font-sans" data-i18n="imp_phase2_title">Trail Braking</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="imp_phase2_desc">
+            Detecta si liberas el freno suavemente (60% &rarr; 10%) mientras metes volante. Carga el eje delantero para rotar el coche hacia el vértice sin subviraje.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="w-6 h-6 rounded-md bg-comp/10 border border-comp/20 flex items-center justify-center text-comp font-telemetry text-xs font-bold">3</span>
+            <span class="text-[10px] font-telemetry text-gray-500 uppercase">Vértice</span>
+          </div>
+          <h3 class="text-sm font-bold text-white font-sans" data-i18n="imp_phase3_title">Velocidad Mínima</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="imp_phase3_desc">
+            El punto más lento de la curva en km/h. Descubre si estás sobre-frenando el coche en la entrada o si entras pasado sacrificando la salida.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="w-6 h-6 rounded-md bg-gain/10 border border-gain/20 flex items-center justify-center text-gain font-telemetry text-xs font-bold">4</span>
+            <span class="text-[10px] font-telemetry text-gray-500 uppercase">Salida</span>
+          </div>
+          <h3 class="text-sm font-bold text-white font-sans" data-i18n="imp_phase4_title">Tracción Temprana</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="imp_phase4_desc">
+            Pisar el acelerador a fondo mientras deshaces volante. Detecta si pisas de golpe activando el corte de TC que resta aceleración en la recta.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Live Pedal HUD Section -->
+  <section id="hud" class="py-14 px-4 border-t border-borderDark/40">
+    <div class="max-w-5xl mx-auto space-y-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-brand font-telemetry uppercase tracking-wider" data-i18n="hud_tag">
+            OVERLAY NATIVO A 50HZ
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black font-brand italic text-white" data-i18n="hud_title">
+            HUD Flotante de Pedales y Trail Braking
+          </h2>
+          <p class="text-sm text-gray-400 max-w-2xl font-sans" data-i18n="hud_desc">
+            Un osciloscopio en tiempo real sobre tu pantalla para ver con el rabillo del ojo cómo descomprimes el pedal de freno en cada frenada. Compilado en Go nativo sin Electron ni caídas de FPS.
+          </p>
+        </div>
+        <a href="hud.html" class="px-4 py-2 rounded-xl bg-night-6 hover:bg-[#1E2738] border border-borderDark text-xs font-bold text-brand hover:text-brand-light transition shrink-0 flex items-center gap-1.5 self-start md:self-auto">
+          <span data-i18n="hud_link">Ver guía y controles del HUD &rarr;</span>
+        </a>
+      </div>
+
+      <!-- Prominent HUD Image & Highlights -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <div class="lg:col-span-7 rounded-2xl bg-night-6 border border-borderDark p-2.5 shadow-2xl overflow-hidden group">
+          <div class="rounded-xl overflow-hidden bg-night-1 border border-borderDark/60">
+            <img src="screenshots/live-pedal-hud.png" alt="HUD de Pedales IdoRacing en Pista" class="w-full h-auto object-contain transition-transform group-hover:scale-[1.01]">
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 space-y-3.5">
+          <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-loss"></span>
+              <h4 class="text-xs font-bold text-white uppercase font-telemetry" data-i18n="hud_f1_title">Osciloscopio Continuo (2.5s)</h4>
+            </div>
+            <p class="text-xs text-gray-400 font-sans" data-i18n="hud_f1_desc">
+              Grafica el recorrido de acelerador y freno con persistencia temporal. Evita el "acantilado" de soltar el freno de golpe a 0%.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand"></span>
+              <h4 class="text-xs font-bold text-white uppercase font-telemetry" data-i18n="hud_f2_title">Detección de Trail Braking</h4>
+            </div>
+            <p class="text-xs text-gray-400 font-sans" data-i18n="hud_f2_desc">
+              Resalta el instante en que mantienes entre un 10% y un 60% de presión mientras metes grados de dirección hacia el ápice.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-comp"></span>
+              <h4 class="text-xs font-bold text-white uppercase font-telemetry" data-i18n="hud_f3_title">Control de Radio & Pep</h4>
+            </div>
+            <p class="text-xs text-gray-400 font-sans" data-i18n="hud_f3_desc">
+              Indicador de volumen y tecla de mute rápido (<kbd class="px-1.5 py-0.2 rounded bg-night-8 text-brand">M</kbd>) para silenciar o reactivar los avisos de voz al vuelo.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- IdoRacing Launcher & Pep Spotter Section -->
+  <section id="launcher" class="py-14 px-4 border-t border-borderDark/40 bg-night-7">
+    <div class="max-w-5xl mx-auto space-y-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-brand font-telemetry uppercase tracking-wider" data-i18n="launcher_tag">
+            SUPERVISOR NATIVO Y RADIO EN PISTA
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black font-brand italic text-white" data-i18n="launcher_title">
+            IdoRacing Launcher y Pep Spotter
+          </h2>
+          <p class="text-sm text-gray-400 max-w-2xl font-sans" data-i18n="launcher_desc">
+            Un único supervisor central (<code class="text-gray-300">idoracing-launcher</code>) gestiona en segundo plano el grabador a 50Hz, el HUD de pedales, las luces Moza y la voz de radio de Pep sin interferir con tu juego.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a href="launcher.html" class="px-3.5 py-2 rounded-xl bg-night-6 hover:bg-[#1E2738] border border-borderDark text-xs font-bold text-brand hover:text-brand-light transition">
+            <span data-i18n="launcher_link">Guía Launcher &rarr;</span>
+          </a>
+          <a href="coach-pep.html" class="px-3.5 py-2 rounded-xl bg-night-6 hover:bg-[#1E2738] border border-borderDark text-xs font-bold text-comp hover:text-[#C258FF] transition">
+            <span data-i18n="pep_link">Guía Pep Spotter &rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Config JSON Box -->
+        <div class="rounded-xl overflow-hidden border border-borderDark bg-[#0A0D14] flex flex-col">
+          <div class="px-4 py-2.5 bg-night-8 border-b border-borderDark flex items-center justify-between text-xs font-telemetry">
+            <span class="text-white font-semibold">idoracing-launcher.json</span>
+            <span class="text-gray-500">Configuración Central</span>
+          </div>
+          <pre class="p-4 text-xs font-telemetry text-gray-200 overflow-x-auto leading-relaxed flex-1"><code>{
+  "subsystems": {
+    "pep_spotter": true,
+    "hud_overlay": true,
+    "moza_shift_lights": true,
+    "recorder": true
+  },
+  "hotkeys": {
+    "spotter_mute": "KeyM"
+  },
+  "audio": {
+    "volume": 85,
+    "language": "es"
+  }
+}</code></pre>
+          <div class="p-3 bg-night-8/80 border-t border-borderDark text-[11px] font-telemetry text-gray-400">
+            Resolución jerárquica: <code class="text-gray-300">./</code> &rarr; <code class="text-gray-300">data/</code> &rarr; <code class="text-gray-300">~/.config/idoracing/</code> con fallback seguro en memoria.
+          </div>
+        </div>
+
+        <!-- Overrides & Pep Highlights -->
+        <div class="space-y-3 flex flex-col justify-between">
+          <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+            <span class="text-xs font-bold text-brand font-telemetry uppercase">Overrides de Sesión por Terminal</span>
+            <p class="text-xs text-gray-400">
+              Anula cualquier subsistema temporalmente con flags sencillos sin editar el archivo:
+            </p>
+            <div class="grid grid-cols-2 gap-2 text-[11px] font-telemetry">
+              <div class="p-2 rounded bg-night-8 border border-white/5 text-gray-300"><code>-no-hud</code> (sin overlay)</div>
+              <div class="p-2 rounded bg-night-8 border border-white/5 text-gray-300"><code>-no-spotter</code> (sin radio)</div>
+              <div class="p-2 rounded bg-night-8 border border-white/5 text-gray-300"><code>-no-moza</code> (sin LEDs)</div>
+              <div class="p-2 rounded bg-night-8 border border-white/5 text-gray-300"><code>-status</code> (diagnóstico)</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-night-6 border border-borderDark space-y-2">
+            <span class="text-xs font-bold text-comp font-telemetry uppercase">Pep: Spotter 100% Offline en Pista</span>
+            <p class="text-xs text-gray-400">
+              Clips de voz locales pregrabados en español e inglés. Te avisa a 250m de curva sobre deltas de frenada, velocidad mínima y presiones de neumáticos (26.5-27.0 psi en ACC).
+            </p>
+            <div class="text-[11px] font-telemetry text-gray-500">
+              Al volver al garaje, Pep puede sintetizar tu stint con modelos locales de IA en tu PC (Ollama / DeepSeek).
+            </div>
+          </div>
         </div>
 
       </div>
@@ -647,10 +872,11 @@
       es: {
         header_slogan: "Telemetría y Asistencia Técnica · SimRacing",
         nav_features: "Características",
-        nav_sims: "Simuladores",
+        nav_improve: "¿Cómo mejora?",
         nav_hud: "HUD Pedales",
+        nav_launcher: "Launcher & Pep",
+        nav_sims: "Simuladores",
         nav_download: "Descargas",
-        nav_faq: "Preguntas",
         hero_badge: "Software Libre · Ligero en Pista · Sin Suscripciones",
         hero_title_1: "Telemetría objetiva,",
         hero_title_2: "análisis por curvas y asistencia en pista",
@@ -677,6 +903,33 @@
         f5_desc: "En pista emite clips cortos de radio a 250m de tus curvas más críticas. En el garaje, puede resumir los datos numéricos de tu stint con un modelo local (Ollama) o API remota si quieres feedback hablado.",
         f6_title: "Tus datos se quedan en tu PC",
         f6_desc: "Base de datos SQLite local en tu disco. Sin cuentas de usuario obligatorias, sin subir tus vueltas a servidores de terceros y 100% operativo sin conexión a internet.",
+        improve_tag: "METODOLOGÍA DE INGENIERÍA",
+        improve_title: "¿Cómo te ayuda IdoRacing a mejorar en pista?",
+        improve_desc: "En lugar de abrumarte con 30 líneas de gráficas indescifrables, IdoRacing desglosa cada curva en 4 fases objetivas y te dice en metros y km/h exactamente dónde estás perdiendo tiempo.",
+        improve_link: "Ver metodología completa →",
+        imp_phase1_title: "Punto de Frenada",
+        imp_phase1_desc: "Mide si frenas antes o después de tu referencia en metros reales. Frenar 8 metros antes en recta cede casi dos décimas antes de girar el volante.",
+        imp_phase2_title: "Trail Braking",
+        imp_phase2_desc: "Detecta si liberas el freno suavemente (60% → 10%) mientras metes volante. Carga el eje delantero para rotar el coche hacia el vértice sin subviraje.",
+        imp_phase3_title: "Velocidad Mínima",
+        imp_phase3_desc: "El punto más lento de la curva en km/h. Descubre si estás sobre-frenando el coche en la entrada o si entras pasado sacrificando la salida.",
+        imp_phase4_title: "Tracción Temprana",
+        imp_phase4_desc: "Pisar el acelerador a fondo mientras deshaces volante. Detecta si pisas de golpe activando el corte de TC que resta aceleración en la recta.",
+        hud_tag: "OVERLAY NATIVO A 50HZ",
+        hud_title: "HUD Flotante de Pedales y Trail Braking",
+        hud_desc: "Un osciloscopio en tiempo real sobre tu pantalla para ver con el rabillo del ojo cómo descomprimes el pedal de freno en cada frenada. Compilado en Go nativo sin Electron ni caídas de FPS.",
+        hud_link: "Ver guía y controles del HUD →",
+        hud_f1_title: "Osciloscopio Continuo (2.5s)",
+        hud_f1_desc: "Grafica el recorrido de acelerador y freno con persistencia temporal. Evita el \"acantilado\" de soltar el freno de golpe a 0%.",
+        hud_f2_title: "Detección de Trail Braking",
+        hud_f2_desc: "Resalta el instante en que mantienes entre un 10% y un 60% de presión mientras metes grados de dirección hacia el ápice.",
+        hud_f3_title: "Control de Radio & Pep",
+        hud_f3_desc: "Indicador de volumen y tecla de mute rápido (M) para silenciar o reactivar los avisos de voz al vuelo.",
+        launcher_tag: "SUPERVISOR NATIVO Y RADIO EN PISTA",
+        launcher_title: "IdoRacing Launcher y Pep Spotter",
+        launcher_desc: "Un único supervisor central (idoracing-launcher) gestiona en segundo plano el grabador a 50Hz, el HUD de pedales, las luces Moza y la voz de radio de Pep sin interferir con tu juego.",
+        launcher_link: "Guía Launcher →",
+        pep_link: "Guía Pep Spotter →",
         sims_tag: "SIMULADORES Y PROTOCOLOS",
         sims_title: "Fidelidad técnica según cada juego",
         sims_desc: "Nos conectamos directamente a la memoria compartida o sockets UDP oficiales de cada simulador, sin inventar datos mecánicos inexistentes.",
@@ -688,10 +941,11 @@
       en: {
         header_slogan: "Telemetry & Trackside Engineering · SimRacing",
         nav_features: "Features",
-        nav_sims: "Simulators",
+        nav_improve: "How to Improve",
         nav_hud: "Pedal HUD",
+        nav_launcher: "Launcher & Pep",
+        nav_sims: "Simulators",
         nav_download: "Downloads",
-        nav_faq: "FAQ",
         hero_badge: "Open Source · Lightweight on Track · No Subscriptions",
         hero_title_1: "Objective telemetry,",
         hero_title_2: "corner phase breakdown and trackside assistance",
@@ -718,6 +972,33 @@
         f5_desc: "On track, short radio audio cues trigger 250m before your most critical corners. In the garage, debrief with a local LLM (Ollama) or remote API summarizing numerical telemetry metrics.",
         f6_title: "Your data stays on your machine",
         f6_desc: "Local SQLite database on disk. No mandatory user accounts, no uploading your laps to cloud servers, and 100% functional without an active internet connection.",
+        improve_tag: "MOTORSPORT ENGINEERING METHODOLOGY",
+        improve_title: "How does IdoRacing help you improve lap times?",
+        improve_desc: "Instead of overwhelming you with 30 undecipherable graph channels, IdoRacing decomposes every corner into 4 objective phases and reports exact meter and km/h deltas.",
+        improve_link: "Explore full methodology →",
+        imp_phase1_title: "Braking Threshold",
+        imp_phase1_desc: "Measures whether you brake early or late compared to your reference in meters. Braking 8 meters early on a straight yields almost two tenths before steering input.",
+        imp_phase2_title: "Trail Braking",
+        imp_phase2_desc: "Detects smooth brake decay (60% → 10%) as you add steering lock. Loads the front axle to pivot the car into the apex without understeer.",
+        imp_phase3_title: "Minimum Apex Speed",
+        imp_phase3_desc: "The slowest point of the corner in km/h. Reveals whether you over-slowed the car on entry or overcooked entry sacrificing exit speed.",
+        imp_phase4_title: "Early Traction",
+        imp_phase4_desc: "Applying full throttle while unwinding steering. Warns if abrupt stomping triggers TC cut intervention that robs straight-line speed.",
+        hud_tag: "NATIVE 50HZ OVERLAY",
+        hud_title: "Floating Pedal HUD & Trail Braking",
+        hud_desc: "A real-time on-screen oscilloscope to monitor how you decompress the brake pedal with your peripheral vision. Pure Go native with zero FPS drops.",
+        hud_link: "View HUD guide & hotkeys →",
+        hud_f1_title: "Continuous Oscilloscope (2.5s)",
+        hud_f1_desc: "Traces throttle and brake with temporal persistence. Eliminates the \"brake release cliff\" of dumping the pedal immediately to 0%.",
+        hud_f2_title: "Trail Braking Detection",
+        hud_f2_desc: "Dynamically lights up when maintaining 10% to 60% brake pressure while feeding in steering lock toward the apex.",
+        hud_f3_title: "Pit Radio & Pep Control",
+        hud_f3_desc: "Volume level and quick mute hotkey (M) to silence or resume voice feedback on the fly.",
+        launcher_tag: "NATIVE SUPERVISOR & TRACKSIDE RADIO",
+        launcher_title: "IdoRacing Launcher and Pep Spotter",
+        launcher_desc: "A single central supervisor (idoracing-launcher) manages the 50Hz telemetry recorder, pedal HUD, Moza lights, and Pep pit radio in the background.",
+        launcher_link: "Launcher Guide →",
+        pep_link: "Pep Spotter Guide →",
         sims_tag: "SIMULATORS & PROTOCOLS",
         sims_title: "Technical fidelity simulator by simulator",
         sims_desc: "Direct integration with official shared memory pages and UDP sockets, with zero fabricated mechanical figures.",

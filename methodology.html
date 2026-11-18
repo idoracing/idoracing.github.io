@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cómo te ayuda IdoRacing a mejorar · Metodología e Ingeniería</title>
+  <meta name="description" content="Aprende cómo IdoRacing desglosa cada curva en 4 fases objetivas (frenada, trail braking, vértice y tracción) para encontrar décimas reales en pista.">
+  <link rel="canonical" href="https://idoracing.github.io/methodology.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://idoracing.github.io/methodology.html">
+  <meta property="og:title" content="Cómo te ayuda IdoRacing a mejorar · Metodología e Ingeniería">
+  <meta property="og:description" content="Desglose por fases de curva, diagnóstico en metros y presiones de neumáticos. Telemetría honesta sin datos inventados.">
+
+  <!-- Google Fonts & Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Racing+Sans+One&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00D2BE',
+            'brand-light': '#33FFEA',
+            accent: '#E10600',
+            comp: '#A814FF',
+            gain: '#00E676',
+            loss: '#FF1744',
+            'night-1': '#08090C',
+            'night-2': '#0A0C10',
+            'night-3': '#0A0C12',
+            'night-4': '#0B0D14',
+            'night-5': '#0C101A',
+            'night-6': '#0E121B',
+            'night-7': '#0E131E',
+            'night-8': '#121622',
+            borderDark: '#1E2638'
+          },
+          fontFamily: {
+            sans: ['"Titillium Web"', 'sans-serif'],
+            telemetry: ['"JetBrains Mono"', 'monospace'],
+            brand: ['"Racing Sans One"', '"Titillium Web"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #08090C; color: #E2E8F0; font-family: 'Titillium Web', sans-serif; }
+    .font-telemetry { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    .font-brand { font-family: 'Racing Sans One', sans-serif; letter-spacing: -0.02em; }
+    .carbon-bg { background-color: #08090C; background-image: radial-gradient(rgba(30, 38, 56, 0.4) 1px, transparent 0); background-size: 24px 24px; }
+  </style>
+</head>
+<body class="carbon-bg min-h-screen flex flex-col selection:bg-brand selection:text-black">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-borderDark bg-[#0A0C12]/95 backdrop-blur-md sticky top-0 z-50 px-4 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2.5 shrink-0 group">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-accent via-[#C00000] to-[#121824] text-white font-bold shadow-md border border-accent/40 group-hover:scale-105 transition-transform">
+          <span class="font-brand text-sm italic tracking-tighter">IR</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-brand text-lg tracking-wider text-white font-black italic">IDORACING</span>
+            <span class="text-xs font-bold text-brand font-telemetry tracking-widest uppercase">ANALYTICS</span>
+          </div>
+          <span class="text-[9px] text-gray-400 font-telemetry -mt-0.5">Telemetría y Asistencia Técnica · SimRacing</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 bg-night-8 p-1 rounded-xl border border-white/5 text-xs font-semibold">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Inicio</a>
+        <a href="methodology.html" class="px-3 py-1.5 rounded-lg text-brand bg-brand/10 border border-brand/20 transition">¿Cómo ayuda a mejorar?</a>
+        <a href="hud.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">HUD Pedales</a>
+        <a href="launcher.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Launcher & Config</a>
+        <a href="coach-pep.html" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Pep Spotter</a>
+        <a href="index.html#download" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition">Descargas</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <a href="https://github.com/idoracing/idoracing" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-night-8 hover:bg-[#1A2030] text-gray-200 border border-borderDark text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span class="hidden sm:inline">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-4xl mx-auto px-4 py-10 space-y-12">
+
+    <!-- Title & Context -->
+    <div class="space-y-3">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-telemetry">
+        <span>METODOLOGÍA DE INGENIERÍA</span>
+        <span>·</span>
+        <span>4 FASES DE CURVA</span>
+        <span>·</span>
+        <span>CERO DATOS INVENTADOS</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black font-brand italic text-white tracking-wide">
+        ¿Cómo te ayuda IdoRacing a mejorar en pista?
+      </h1>
+      <p class="text-base text-gray-400 leading-relaxed font-sans">
+        Mirar una gráfica de telemetría tradicional con 30 canales cruzados confunde y no te dice qué hacer en el volante. IdoRacing desglosa cada curva en métricas físicas directas y comprensibles.
+      </p>
+    </div>
+
+    <!-- The 4 Phases Breakdown Grid -->
+    <section class="space-y-6">
+      <div class="flex items-center gap-2.5">
+        <span class="text-brand font-telemetry text-sm font-bold">// DINÁMICA VEHICULAR</span>
+        <span class="text-gray-600">·</span>
+        <h2 class="text-xl sm:text-2xl font-bold font-brand italic text-white">
+          El Desglose de Curva en 4 Fases Clave
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- Phase 1 -->
+        <div class="p-5 rounded-2xl bg-night-6 border border-borderDark space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-loss/10 border border-loss/20 flex items-center justify-center text-loss font-telemetry text-xs font-bold">1</span>
+              <h3 class="text-base font-bold text-white">Fase 1: Punto de Frenada (Braking Threshold)</h3>
+            </div>
+            <span class="text-xs text-gray-400 font-telemetry">Metros antes de curva</span>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+            Mide el instante exacto en que alcanzas el 100% de presión de freno. Si frenas 10 metros antes que tu vuelta de referencia en la recta de Monza o Spa, pierdes <strong>0.15s instantáneamente</strong> antes de haber empezado a girar. IdoRacing te da la distancia métrica exacta de frenada.
+          </p>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="p-5 rounded-2xl bg-night-6 border border-borderDark space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-brand/10 border border-brand/20 flex items-center justify-center text-brand font-telemetry text-xs font-bold">2</span>
+              <h3 class="text-base font-bold text-white">Fase 2: Trail Braking y Rotación (Trail & Turn-in)</h3>
+            </div>
+            <span class="text-xs text-brand font-telemetry font-bold">La clave del simracing</span>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+            La transición donde se suelta el freno progresivamente mientras se mete volante. Mantener un 10-20% de freno al entrar comprime la amortiguación delantera, carga peso sobre los neumáticos directrices y hace que el coche pivote hacia el vértice sin subvirar.
+          </p>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="p-5 rounded-2xl bg-night-6 border border-borderDark space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-comp/10 border border-comp/20 flex items-center justify-center text-comp font-telemetry text-xs font-bold">3</span>
+              <h3 class="text-base font-bold text-white">Fase 3: Vértice y Velocidad Mínima (Apex Minimum Speed)</h3>
+            </div>
+            <span class="text-xs text-gray-400 font-telemetry">Velocidad en km/h</span>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+            El punto más lento de la curva. Si tu velocidad mínima es 6 km/h inferior a tu vuelta rápida de referencia, has sobre-frenado. Pero si es 10 km/h superior y te has ido largo saliendo fuera de la línea óptima, tu salida a recta quedará arruinada.
+          </p>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="p-5 rounded-2xl bg-night-6 border border-borderDark space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-gain/10 border border-gain/20 flex items-center justify-center text-gain font-telemetry text-xs font-bold">4</span>
+              <h3 class="text-base font-bold text-white">Fase 4: Tracción y Salida (Exit Acceleration)</h3>
+            </div>
+            <span class="text-xs text-gray-400 font-telemetry">Momento de aceleración</span>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+            El momento de aplicar gas y deshacer volante. Pisar el acelerador de golpe con el volante todavía girado activa el corte de Control de Tracción (TC), provocando tirones y pérdida de aceleración en la recta subsiguiente.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Engineering Principles: Tyres and Setup -->
+    <section class="p-6 rounded-2xl bg-night-6 border border-borderDark space-y-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-brand font-telemetry text-sm font-bold">// REGLAJES Y NEUMÁTICOS</span>
+        <span class="text-gray-600">·</span>
+        <h2 class="text-lg font-bold text-white font-brand italic">
+          La Ventana Óptima de Presiones en ACC (26.5 - 27.0 psi)
+        </h2>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+        <p>
+          En Assetto Corsa Competizione (y simuladores modernos GT3), las presiones de los neumáticos en caliente definen más del 50% del agarre y la estabilidad de frenada del coche:
+        </p>
+        <ul class="list-disc list-inside space-y-1 font-telemetry text-xs text-gray-300 bg-night-8 p-3 rounded-xl border border-white/5">
+          <li><strong>Ventana óptima:</strong> <span class="text-brand font-bold">26.5 a 27.0 psi</span> con los neumáticos estabilizados tras 3 vueltas completas.</li>
+          <li><strong>Presión baja (&lt; 26.2 psi):</strong> El neumático flexa en exceso, el coche se siente impreciso y la temperatura sube rápidamente en los hombros.</li>
+          <li><strong>Presión excesiva (&gt; 27.1 psi):</strong> Se reduce la huella de contacto del neumático con el asfalto, provocando pérdidas bruscas de tracción y bloqueos de freno más tempranos.</li>
+        </ul>
+        <p>
+          IdoRacing compara las presiones dinámicas a 50Hz durante tu tanda y te indica exactamente cuántos clics de garaje debes subir o bajar en cada rueda para clavar la ventana óptima.
+        </p>
+      </div>
+    </section>
+
+    <!-- Honest Telemetry: Zero Fake Data -->
+    <section class="space-y-3">
+      <h2 class="text-xl font-bold font-brand italic text-white">
+        Honestidad Técnica: Cero Datos Inventados
+      </h2>
+      <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+        A diferencia de otras herramientas que muestran valores genéricos inventados cuando un simulador no los emite, IdoRacing aplica una política estricta de honestidad técnica:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-telemetry">
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+          <span class="text-white font-bold">ACC (Kunos)</span>
+          <p class="text-gray-400">Lee directamente los archivos completos de reglajes mecánicos en disco (<code class="text-gray-300">.json</code>) y muestra el 100% de suspensiones, aerodinámica y geometrías reales.</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+          <span class="text-white font-bold">AC EVO & AC Rally</span>
+          <p class="text-gray-400">La memoria compartida no expone muelles ni barras estáticas. Si el usuario no guarda setup en el simulador, se muestra con transparencia como <strong class="text-brand">N/D</strong> mientras la telemetría a 50Hz de pista permanece activa.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation CTA -->
+    <div class="pt-8 border-t border-borderDark/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <a href="index.html" class="text-xs text-brand hover:text-brand-light font-semibold flex items-center gap-1.5 transition">
+        <span>&larr; Volver a la portada de IdoRacing</span>
+      </a>
+      <a href="hud.html" class="px-4 py-2 rounded-xl bg-night-8 hover:bg-night-6 border border-borderDark text-xs font-bold text-white transition flex items-center gap-2">
+        <span>Guía del HUD de Pedales & Trail Braking &rarr;</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-borderDark bg-[#05070B] py-8 px-4 text-xs text-gray-500 font-telemetry mt-auto">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-brand text-sm italic text-white font-bold">IDORACING</span>
+        <span>·</span>
+        <span>Código Abierto bajo Licencia MIT</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/idoracing/idoracing" class="hover:text-brand transition">GitHub</a>
+        <a href="https://github.com/idoracing/idoracing/releases" class="hover:text-brand transition">Releases</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
