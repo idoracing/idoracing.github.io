@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IdoRacing Analytics · Telemetría y Asistencia Técnica para SimRacing</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Herramienta libre y ligera de telemetría a 50Hz para SimRacing (ACC, LMU, AC EVO). Grabador nativo en Go con 0% de carga en carrera, osciloscopio HUD de trail braking, luces Moza en Linux y análisis de curvas en garaje.">
+  <meta name="keywords" content="simracing, telemetria, assetto corsa competizione, acc coach, le mans ultimate, lmu telemetry, assetto corsa evo, trail braking hud, moza shift lights linux, idoracing">
+  <meta name="author" content="Miquel Barba">
+  <link rel="canonical" href="https://miquelbar.github.io/idoracing/">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <!-- OpenGraph / Facebook / Discord -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://miquelbar.github.io/idoracing/">
+  <meta property="og:title" content="IdoRacing Analytics · Telemetría y Análisis para SimRacing">
+  <meta property="og:description" content="Grabación a 50Hz sin consumo de CPU en pista, HUD flotante de pedales para entrenar trail braking, luces Moza en Linux y análisis objetivo por curvas.">
+  <meta property="og:image" content="https://miquelbar.github.io/idoracing/screenshots/telemetry-overview.png">
+  
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://miquelbar.github.io/idoracing/">
+  <meta name="twitter:title" content="IdoRacing Analytics · Telemetría y Análisis para SimRacing">
+  <meta name="twitter:description" content="Grabación a 50Hz sin consumo de CPU en pista, HUD flotante de pedales para entrenar trail braking, luces Moza en Linux y análisis objetivo por curvas.">
+  <meta name="twitter:image" content="https://miquelbar.github.io/idoracing/screenshots/telemetry-overview.png">
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "IdoRacing Analytics",
+    "operatingSystem": "Linux, Windows",
+    "applicationCategory": "GameApplication",
+    "description": "Herramienta ligera y de código abierto de telemetría a 50Hz, HUD de trail braking y análisis de curvas para simuladores de carreras.",
+    "license": "https://opensource.org/licenses/MIT",
+    "url": "https://miquelbar.github.io/idoracing/",
+    "author": {
+      "@type": "Person",
+      "name": "Miquel Barba"
+    }
+  }
+  </script>
+
+  <!-- Google Fonts: Titillium Web, JetBrains Mono, Racing Sans One -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Racing+Sans+One&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00D2BE',
+            'brand-light': '#00E5CF',
+            comp: '#B138FE',
+            gain: '#00FF7F',
+            loss: '#FF1801',
+            accent: '#E10600',
+            'night-1': '#05070B',
+            'night-2': '#07090E',
+            'night-3': '#080B11',
+            'night-4': '#090D15',
+            'night-5': '#0C101A',
+            'night-6': '#0E121B',
+            'night-7': '#0E131E',
+            'night-8': '#121622',
+            borderDark: '#1E2638'
+          },
+          fontFamily: {
+            sans: ['"Titillium Web"', 'sans-serif'],
+            telemetry: ['"JetBrains Mono"', 'monospace'],
+            brand: ['"Racing Sans One"', '"Titillium Web"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #08090C;
+      color: #E2E8F0;
+      font-family: 'Titillium Web', sans-serif;
+    }
+    .font-telemetry {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .font-brand {
+      font-family: 'Racing Sans One', sans-serif;
+      letter-spacing: -0.02em;
+    }
+    /* Subtle carbon weave pattern overlay */
+    .carbon-bg {
+      background-color: #08090C;
+      background-image: radial-gradient(rgba(30, 38, 56, 0.4) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #08090C;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E2638;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00D2BE;
+    }
+  </style>
+</head>
+<body class="carbon-bg min-h-screen flex flex-col selection:bg-brand selection:text-black">
+
+  <!-- Top Navigation Header (Matching App Header) -->
+  <header class="border-b border-borderDark bg-[#0A0C12]/95 backdrop-blur-md sticky top-0 z-50 px-4 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-2.5 shrink-0 group">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-accent via-[#C00000] to-[#121824] text-white font-bold shadow-md border border-accent/40 group-hover:scale-105 transition-transform">
+          <span class="font-brand text-sm italic tracking-tighter">IR</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-brand text-lg tracking-wider text-white font-black italic">
+              IDORACING
+            </span>
+            <span class="text-xs font-bold text-brand font-telemetry tracking-widest uppercase">
+              ANALYTICS
+            </span>
+          </div>
+          <span class="text-[9px] text-gray-400 font-telemetry -mt-0.5 hidden sm:inline" data-i18n="header_slogan">
+            Telemetría y Asistencia Técnica · SimRacing
+          </span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-1 bg-night-8 p-1 rounded-xl border border-white/5 text-xs font-semibold">
+        <a href="#features" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_features">Características</a>
+        <a href="#sims" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_sims">Simuladores</a>
+        <a href="#hud" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_hud">HUD Pedales</a>
+        <a href="#download" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_download">Descargas</a>
+        <a href="#faq" class="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/[0.04] transition" data-i18n="nav_faq">Preguntas</a>
+      </nav>
+
+      <!-- Right Controls: Language Selector & GitHub Link -->
+      <div class="flex items-center gap-2.5">
+        <!-- Lang Toggle -->
+        <div class="flex items-center bg-night-8 p-0.5 rounded-lg border border-borderDark text-[11px] font-telemetry font-bold">
+          <button id="lang-es" onclick="setLang('es')" class="px-2 py-0.5 rounded transition bg-brand/20 text-brand">ES</button>
+          <button id="lang-en" onclick="setLang('en')" class="px-2 py-0.5 rounded transition text-gray-400 hover:text-white">EN</button>
+        </div>
+
+        <!-- GitHub Repo CTA -->
+        <a href="https://github.com/miquelbar/idoracing" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-night-8 hover:bg-[#1A2030] text-gray-200 border border-borderDark text-xs font-semibold transition group">
+          <svg class="w-4 h-4 text-gray-300 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span class="hidden sm:inline">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-12 pb-16 px-4 overflow-hidden border-b border-borderDark/40">
+    <div class="max-w-4xl mx-auto text-center space-y-6">
+      
+      <!-- Humble Badge -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-night-8 border border-white/10 text-xs font-telemetry text-gray-300">
+        <span class="w-2 h-2 rounded-full bg-gain animate-pulse"></span>
+        <span data-i18n="hero_badge">Software Libre · Ligero en Pista · Sin Suscripciones</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white font-brand italic uppercase leading-tight">
+        <span data-i18n="hero_title_1">Telemetría objetiva,</span><br>
+        <span class="text-brand not-italic font-normal" data-i18n="hero_title_2">análisis por curvas y asistencia en pista</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto font-sans leading-relaxed" data-i18n="hero_desc">
+        Graba telemetría a 50Hz sin penalizar los FPS de tu simulador. Compara dónde pierdes tiempo en cada fase de la curva (frenada, vértice o aceleración), entrena el trail braking con un HUD ligero y recibe avisos de referencia por radio.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <a href="#download" class="px-5 py-2.5 rounded-xl bg-brand hover:bg-brand-light text-night-1 font-bold text-sm transition shadow-lg shadow-brand/10 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span data-i18n="hero_btn_download">Descargar v0.4.0 Gratis</span>
+        </a>
+        <a href="#quickstart" class="px-5 py-2.5 rounded-xl bg-night-8 hover:bg-[#161D2B] text-gray-200 border border-borderDark font-semibold text-sm transition flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span data-i18n="hero_btn_quickstart">Guía Rápida de Uso</span>
+        </a>
+      </div>
+
+      <!-- Simulator Pill Badges -->
+      <div class="pt-4 flex flex-wrap items-center justify-center gap-2 text-[11px] font-telemetry text-gray-400">
+        <span class="text-gray-500" data-i18n="hero_supported_label">Compatible con:</span>
+        <span class="px-2 py-0.5 rounded bg-night-8 border border-white/5 text-gray-300">ACC</span>
+        <span class="px-2 py-0.5 rounded bg-night-8 border border-white/5 text-gray-300">Le Mans Ultimate</span>
+        <span class="px-2 py-0.5 rounded bg-night-8 border border-white/5 text-gray-300">Assetto Corsa EVO</span>
+        <span class="px-2 py-0.5 rounded bg-night-8 border border-white/5 text-gray-300">AC Rally</span>
+        <span class="px-2 py-0.5 rounded bg-night-8 border border-white/5 text-gray-300">DiRT Rally 2.0 / WRC</span>
+        <span class="px-2 py-0.5 rounded bg-night-8 border border-white/5 text-gray-300">AC1</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Screenshot Viewer (Matching App Style) -->
+  <section class="max-w-5xl mx-auto px-4 -mt-6 mb-16 w-full">
+    <div class="bg-night-6 border border-borderDark rounded-2xl p-2 sm:p-3 shadow-2xl overflow-hidden">
+      
+      <!-- Screen Switcher Tabs -->
+      <div class="flex items-center gap-1.5 pb-3 px-1 border-b border-white/5 overflow-x-auto text-xs font-semibold" style="scrollbar-width: none;">
+        <button onclick="switchTab('telemetry')" id="tab-btn-telemetry" class="px-3 py-1.5 rounded-lg transition bg-[#1E2738] text-white border border-white/10 flex items-center gap-1.5 shrink-0">
+          <svg class="w-3.5 h-3.5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span data-i18n="tab_telemetry">Telemetría y Delta</span>
+        </button>
+        <button onclick="switchTab('hud')" id="tab-btn-hud" class="px-3 py-1.5 rounded-lg transition text-gray-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 shrink-0">
+          <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span data-i18n="tab_hud">HUD Pedales (X11)</span>
+        </button>
+        <button onclick="switchTab('corner')" id="tab-btn-corner" class="px-3 py-1.5 rounded-lg transition text-gray-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 shrink-0">
+          <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <span data-i18n="tab_corner">Análisis por Curvas</span>
+        </button>
+        <button onclick="switchTab('sessions')" id="tab-btn-sessions" class="px-3 py-1.5 rounded-lg transition text-gray-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 shrink-0">
+          <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <span data-i18n="tab_sessions">Espacio de Sesiones</span>
+        </button>
+      </div>
+
+      <!-- Image Display Frame -->
+      <div class="mt-2.5 rounded-xl bg-night-1 border border-borderDark/60 overflow-hidden relative min-h-[300px] flex items-center justify-center">
+        <img id="main-screenshot" src="screenshots/telemetry-overview.png" alt="IdoRacing Telemetry Overview" 
+             class="w-full h-auto object-contain max-h-[640px] rounded-lg transition-opacity duration-200">
+      </div>
+      <p id="screenshot-caption" class="text-xs text-gray-400 font-telemetry text-center pt-2">
+        Vista completa de canales: velocidad, delta frente a la vuelta de referencia, trazas de acelerador/freno y ángulo de volante.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- Real Value / Features Section (Humble & Concrete) -->
+  <section id="features" class="py-12 px-4 border-t border-borderDark/40">
+    <div class="max-w-5xl mx-auto space-y-10">
+      
+      <!-- Section Header -->
+      <div class="space-y-2">
+        <div class="text-xs font-bold text-brand font-telemetry uppercase tracking-wider" data-i18n="features_tag">
+          ARQUITECTURA Y FUNCIONAMIENTO REAL
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black font-brand italic text-white" data-i18n="features_title">
+          Qué hace IdoRacing y cómo funciona exactamente
+        </h2>
+        <p class="text-sm text-gray-400 max-w-2xl" data-i18n="features_subtitle">
+          Diseñado para simracers que quieren datos claros sin perder tiempo configurando proyectos complejos ni sobrecargar el ordenador mientras conducen.
+        </p>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        
+        <!-- Feature 1: Go Native Supervisor -->
+        <div class="bg-night-6 border border-borderDark p-4 rounded-xl space-y-2.5 hover:border-brand/40 transition">
+          <div class="w-8 h-8 rounded-lg bg-brand/10 border border-brand/30 flex items-center justify-center text-brand">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white font-sans" data-i18n="f1_title">0% de carga en carrera (Go nativo)</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="f1_desc">
+            En pista sólo corre el ejecutable compilado en Go (< 15MB RAM y 0% CPU). Sin Python, sin Node y sin navegadores en segundo plano mientras pilotas. Cero caídas de FPS o micro-stuttering.
+          </p>
+        </div>
+
+        <!-- Feature 2: Pedal HUD -->
+        <div id="hud" class="bg-night-6 border border-borderDark p-4 rounded-xl space-y-2.5 hover:border-brand/40 transition">
+          <div class="w-8 h-8 rounded-lg bg-gain/10 border border-gain/30 flex items-center justify-center text-gain">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white font-sans" data-i18n="f2_title">HUD de Pedales y Trail Braking</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="f2_desc">
+            Osciloscopio flotante y ligero que dibuja el acelerador y el freno en tiempo real. Te indica si estás soltando el freno de forma progresiva (entre el 60% y el 10%) para meter el morro en el vértice.
+          </p>
+        </div>
+
+        <!-- Feature 3: Moza Linux Serial -->
+        <div class="bg-night-6 border border-borderDark p-4 rounded-xl space-y-2.5 hover:border-brand/40 transition">
+          <div class="w-8 h-8 rounded-lg bg-comp/10 border border-comp/30 flex items-center justify-center text-comp">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white font-sans" data-i18n="f3_title">Luces de volante Moza en Linux</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="f3_desc">
+            Comunica por puerto serie nativo (CDC-ACM) directamente con las bases Moza en Linux. Enciende los LEDs progresivos de RPM y destello de cambio sin necesidad de Pit House, SimHub ni Boxflat.
+          </p>
+        </div>
+
+        <!-- Feature 4: Corner Phase Breakdown -->
+        <div class="bg-night-6 border border-borderDark p-4 rounded-xl space-y-2.5 hover:border-brand/40 transition">
+          <div class="w-8 h-8 rounded-lg bg-accent/10 border border-accent/30 flex items-center justify-center text-accent">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white font-sans" data-i18n="f4_title">Desglose de curva en 3 fases</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="f4_desc">
+            Cada curva se separa objetivamente en frenada/aproximación, paso por vértice y salida. Sabrás al milímetro si la pérdida de tiempo se debe a frenar antes, a subviraje en apoyo o a tardar en dar gas.
+          </p>
+        </div>
+
+        <!-- Feature 5: Pep Audio Spotter -->
+        <div class="bg-night-6 border border-borderDark p-4 rounded-xl space-y-2.5 hover:border-brand/40 transition">
+          <div class="w-8 h-8 rounded-lg bg-brand/10 border border-brand/30 flex items-center justify-center text-brand">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white font-sans" data-i18n="f5_title">Pep: Avisos en pista y debrief</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="f5_desc">
+            En pista emite clips cortos de radio a 250m de tus curvas más críticas. En el garaje, puede resumir los datos numéricos de tu stint con un modelo local (Ollama) o API remota si quieres feedback hablado.
+          </p>
+        </div>
+
+        <!-- Feature 6: Local & Private -->
+        <div class="bg-night-6 border border-borderDark p-4 rounded-xl space-y-2.5 hover:border-brand/40 transition">
+          <div class="w-8 h-8 rounded-lg bg-gain/10 border border-gain/30 flex items-center justify-center text-gain">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white font-sans" data-i18n="f6_title">Tus datos se quedan en tu PC</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-sans" data-i18n="f6_desc">
+            Base de datos SQLite local en tu disco. Sin cuentas de usuario obligatorias, sin subir tus vueltas a servidores de terceros y 100% operativo sin conexión a internet.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Supported Simulators Section -->
+  <section id="sims" class="py-12 px-4 border-t border-borderDark/40 bg-night-7">
+    <div class="max-w-5xl mx-auto space-y-8">
+      
+      <div class="space-y-2">
+        <div class="text-xs font-bold text-brand font-telemetry uppercase tracking-wider" data-i18n="sims_tag">
+          SIMULADORES Y PROTOCOLOS
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black font-brand italic text-white" data-i18n="sims_title">
+          Fidelidad técnica según cada juego
+        </h2>
+        <p class="text-sm text-gray-400 max-w-2xl" data-i18n="sims_desc">
+          Nos conectamos directamente a la memoria compartida o sockets UDP oficiales de cada simulador, sin inventar datos mecánicos inexistentes.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        
+        <!-- ACC -->
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">Assetto Corsa Competizione</span>
+            <span class="text-[10px] font-telemetry px-1.5 py-0.5 rounded bg-brand/10 text-brand">Shared Memory</span>
+          </div>
+          <p class="text-xs text-gray-400">
+            Física completa a 50Hz (fuerzas G, pedales, recorridos de suspensión, presiones dinámicas de neumáticos) y lectura directa de archivos de setup de garaje.
+          </p>
+        </div>
+
+        <!-- LMU -->
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">Le Mans Ultimate</span>
+            <span class="text-[10px] font-telemetry px-1.5 py-0.5 rounded bg-comp/10 text-comp">rF2 Plugin</span>
+          </div>
+          <p class="text-xs text-gray-400">
+            Conexión con el plugin de memoria compartida oficial. Resuelve el vehículo del jugador en parrillas multiclase WEC (Hypercar, LMP2, GT3) sin truncar buffers.
+          </p>
+        </div>
+
+        <!-- AC EVO -->
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">Assetto Corsa EVO</span>
+            <span class="text-[10px] font-telemetry px-1.5 py-0.5 rounded bg-gain/10 text-gain">Early Access</span>
+          </div>
+          <p class="text-xs text-gray-400">
+            Grabación de física en pista viva, neumáticos y pedales. Soporte para setups propietarios en formato binario <code class="text-[11px] text-gray-300">.carsetup</code>.
+          </p>
+        </div>
+
+        <!-- Rally Points -->
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">AC Rally & DiRT 2.0 / WRC</span>
+            <span class="text-[10px] font-telemetry px-1.5 py-0.5 rounded bg-yellow-400/10 text-yellow-400">Punto a Punto</span>
+          </div>
+          <p class="text-xs text-gray-400">
+            Cálculo genérico de distancia por desplazamiento sin requerir trazados cerrados. Registra tramos lineales completos desde la salida hasta la meta.
+          </p>
+        </div>
+
+        <!-- AC1 -->
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">Assetto Corsa 1</span>
+            <span class="text-[10px] font-telemetry px-1.5 py-0.5 rounded bg-white/10 text-gray-300">Clásico</span>
+          </div>
+          <p class="text-xs text-gray-400">
+            Memoria compartida estándar de Kunos para circuito y lectura de reglajes mecánicos en formato <code class="text-[11px] text-gray-300">.ini</code>.
+          </p>
+        </div>
+
+        <!-- MoTeC Compatibility -->
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">Importador MoTeC</span>
+            <span class="text-[10px] font-telemetry px-1.5 py-0.5 rounded bg-blue-400/10 text-blue-400">.ld / .ldx</span>
+          </div>
+          <p class="text-xs text-gray-400">
+            Lector binario para importar archivos generados por herramientas como MoTeC i2 Pro y visualizarlos en el interfaz web de IdoRacing sin conversiones previas.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Download & Quickstart Section -->
+  <section id="download" class="py-14 px-4 border-t border-borderDark/40">
+    <div class="max-w-4xl mx-auto space-y-8">
+      
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl sm:text-3xl font-black font-brand italic text-white" data-i18n="dl_title">
+          Descargas y Puesta en Marcha
+        </h2>
+        <p class="text-sm text-gray-400 max-w-xl mx-auto" data-i18n="dl_desc">
+          Binarios precompilados de la última versión estable (v0.4.0) listos para usar sin necesidad de compilar código fuente.
+        </p>
+      </div>
+
+      <!-- Download Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        <!-- Linux Card -->
+        <div class="p-5 rounded-xl bg-night-6 border border-borderDark space-y-4 hover:border-brand/40 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center text-brand">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Linux (Steam + Proton)</h3>
+              <span class="text-xs text-gray-400 font-telemetry">amd64 / x86_64</span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400">
+            Incluye el supervisor nativo <code class="text-gray-300">idoracing-launcher</code>, el osciloscopio HUD <code class="text-gray-300">idoracing-hud</code> y el grabador Proton.
+          </p>
+          <a href="https://github.com/miquelbar/idoracing/releases/latest/download/idoracing-linux-amd64.tar.gz" 
+             class="w-full py-2 px-3 rounded-lg bg-brand hover:bg-brand-light text-night-1 font-bold text-xs transition flex items-center justify-center gap-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>Descargar idoracing-linux-amd64.tar.gz</span>
+          </a>
+        </div>
+
+        <!-- Windows Card -->
+        <div class="p-5 rounded-xl bg-night-6 border border-borderDark space-y-4 hover:border-brand/40 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-comp/10 border border-comp/20 flex items-center justify-center text-comp">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Windows (Nativo)</h3>
+              <span class="text-xs text-gray-400 font-telemetry">Windows 10 / 11 64-bit</span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400">
+            Ejecutable silencioso de fondo sin ventanas molestas de terminal (<code class="text-gray-300">idoracing-recorder.exe</code>).
+          </p>
+          <a href="https://github.com/miquelbar/idoracing/releases/latest/download/idoracing-windows-amd64.zip" 
+             class="w-full py-2 px-3 rounded-lg bg-comp hover:bg-[#C258FF] text-white font-bold text-xs transition flex items-center justify-center gap-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>Descargar idoracing-windows-amd64.zip</span>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Quickstart Steam Launch Option -->
+      <div id="quickstart" class="p-5 rounded-xl bg-night-6 border border-borderDark space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-brand font-telemetry uppercase tracking-wider">
+            OPCIÓN DE LANZAMIENTO EN STEAM (LINUX)
+          </span>
+          <span class="text-[11px] text-gray-400 font-telemetry">Propiedades > General > Opciones de Lanzamiento</span>
+        </div>
+        <div class="bg-night-1 border border-borderDark rounded-lg p-2.5 flex items-center justify-between gap-3 font-telemetry text-xs text-gray-200">
+          <code class="overflow-x-auto whitespace-nowrap text-brand">gamemoderun /ruta/a/idoracing/recorder/bin/idoracing-launcher %command%</code>
+          <button onclick="copyLaunchCommand()" id="copy-btn" class="px-2.5 py-1 rounded bg-night-8 hover:bg-[#1E2638] text-gray-300 text-xs font-semibold shrink-0 transition flex items-center gap-1 border border-white/5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span id="copy-text">Copiar</span>
+          </button>
+        </div>
+        <p class="text-xs text-gray-400 leading-relaxed font-sans">
+          💡 <strong>Flags de anulación opcionales:</strong> puedes desactivar partes concretas sin tocar el JSON (ej. <code class="text-gray-300">-no-hud</code>, <code class="text-gray-300">-no-moza</code>, <code class="text-gray-300">-no-spotter</code>, <code class="text-gray-300">-no-recorder</code>). Si no existe archivo de configuración, corre automáticamente con los valores por defecto sin dar error.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ Section (Humble & Clear) -->
+  <section id="faq" class="py-12 px-4 border-t border-borderDark/40 bg-night-7">
+    <div class="max-w-3xl mx-auto space-y-6">
+      
+      <div class="text-center space-y-1.5">
+        <h2 class="text-2xl font-black font-brand italic text-white" data-i18n="faq_title">
+          Preguntas Frecuentes
+        </h2>
+        <p class="text-xs text-gray-400" data-i18n="faq_desc">
+          Respuestas transparentes sobre requisitos y limitaciones.
+        </p>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+          <h4 class="font-bold text-white text-sm">¿Afecta a los FPS del juego mientras conduzco?</h4>
+          <p class="text-gray-400 leading-relaxed">
+            No. Mientras conduces solo está activo el binario nativo en Go (<code class="text-gray-300">idoracing-launcher</code>), que consume menos de 15MB de RAM y un porcentaje inapreciable de CPU. La interfaz web y el análisis en Python solo se ejecutan cuando tú decides abrirlos en el garaje.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+          <h4 class="font-bold text-white text-sm">¿Sustituye a un ingeniero de datos o a MoTeC?</h4>
+          <p class="text-gray-400 leading-relaxed">
+            No pretende ser un software de ingeniería profunda con 300 canales de telemetría como MoTeC i2 Pro. Su objetivo es darte respuesta en 10 segundos al terminar la tanda: decirte exactamente en qué curva pierdes tiempo, si frenaste tarde o con poco trail braking, sin tener que configurar hojas de cálculo ni proyectos complejos.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+          <h4 class="font-bold text-white text-sm">¿Funciona en local y sin conexión a internet?</h4>
+          <p class="text-gray-400 leading-relaxed">
+            Sí. Todo el flujo de grabación, el osciloscopio HUD de pedales, las luces Moza y los avisos de voz de curvas funcionan 100% en local y sin conexión. Para la parte de debrief en garaje, puedes conectar un modelo local gratuito mediante Ollama (<code class="text-gray-300">qwen2.5</code>, <code class="text-gray-300">llama3</code>) sin enviar datos a servidores externos.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-night-6 border border-borderDark space-y-1">
+          <h4 class="font-bold text-white text-sm">¿Qué volantes y pedales son compatibles?</h4>
+          <p class="text-gray-400 leading-relaxed">
+            Cualquiera. El grabador lee directamente la física del simulador (freno, acelerador, dirección, marchas), por lo que funciona tanto con pedales de célula de carga como potenciómetros o mando. El módulo de luces de revoluciones por serie está adaptado específicamente a aros y bases Moza Racing en Linux.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-borderDark bg-[#05070B] py-8 px-4 text-xs text-gray-500 font-telemetry">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-brand text-sm italic text-white font-bold">IDORACING</span>
+        <span class="text-gray-600">·</span>
+        <span>Código Abierto bajo Licencia MIT</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/miquelbar/idoracing" class="hover:text-brand transition">GitHub</a>
+        <a href="https://github.com/miquelbar/idoracing/releases" class="hover:text-brand transition">Releases</a>
+        <a href="https://github.com/miquelbar/idoracing/blob/main/CHANGELOG.md" class="hover:text-brand transition">Changelog</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Simple Interactive Scripts: Screenshots Switcher & Lang Toggle -->
+  <script>
+    const screenshots = {
+      telemetry: {
+        src: 'screenshots/telemetry-overview.png',
+        caption_es: 'Vista completa de canales: velocidad, delta frente a la vuelta de referencia, trazas de acelerador/freno y ángulo de volante.',
+        caption_en: 'Full channel telemetry: speed, delta against reference lap, throttle/brake pedal traces and steering angle.'
+      },
+      hud: {
+        src: 'screenshots/live-pedal-hud.png',
+        caption_es: 'HUD nativo en Go (X11/Windows): osciloscopio en tiempo real con detección visual de trail braking y controles de radio.',
+        caption_en: 'Native Go HUD (X11/Windows): real-time pedal oscilloscope with progressive trail braking detection and radio controls.'
+      },
+      corner: {
+        src: 'screenshots/corner-phase-analysis.png',
+        caption_es: 'Desglose por fases de curva: diagnóstico objetivo en metros de frenada, velocidad mínima en vértice y tracción de salida.',
+        caption_en: 'Corner phase breakdown: objective delta metrics for braking distance, minimum apex speed and exit acceleration.'
+      },
+      sessions: {
+        src: 'screenshots/sessions-workspace.png',
+        caption_es: 'Espacio de trabajo local: historial de stints, vueltas ordenadas por tiempo y selección de referencias para comparar.',
+        caption_en: 'Local workspace: stint history, laps ranked by laptime and reference lap selection for comparison.'
+      }
+    };
+
+    let currentTab = 'telemetry';
+    let currentLang = 'es';
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      const tabData = screenshots[tabId];
+      if (!tabData) return;
+
+      const img = document.getElementById('main-screenshot');
+      const caption = document.getElementById('screenshot-caption');
+      
+      img.style.opacity = '0.3';
+      setTimeout(() => {
+        img.src = tabData.src;
+        caption.innerText = currentLang === 'en' ? tabData.caption_en : tabData.caption_es;
+        img.style.opacity = '1';
+      }, 150);
+
+      // Update button styling
+      ['telemetry', 'hud', 'corner', 'sessions'].forEach(id => {
+        const btn = document.getElementById('tab-btn-' + id);
+        if (id === tabId) {
+          btn.className = 'px-3 py-1.5 rounded-lg transition bg-[#1E2738] text-white border border-white/10 flex items-center gap-1.5 shrink-0';
+          const icon = btn.querySelector('svg');
+          if (icon) icon.classList.add('text-brand');
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg transition text-gray-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 shrink-0';
+          const icon = btn.querySelector('svg');
+          if (icon) icon.classList.remove('text-brand');
+        }
+      });
+    }
+
+    const i18nTexts = {
+      es: {
+        header_slogan: "Telemetría y Asistencia Técnica · SimRacing",
+        nav_features: "Características",
+        nav_sims: "Simuladores",
+        nav_hud: "HUD Pedales",
+        nav_download: "Descargas",
+        nav_faq: "Preguntas",
+        hero_badge: "Software Libre · Ligero en Pista · Sin Suscripciones",
+        hero_title_1: "Telemetría objetiva,",
+        hero_title_2: "análisis por curvas y asistencia en pista",
+        hero_desc: "Graba telemetría a 50Hz sin penalizar los FPS de tu simulador. Compara dónde pierdes tiempo en cada fase de la curva (frenada, vértice o aceleración), entrena el trail braking con un HUD ligero y recibe avisos de referencia por radio.",
+        hero_btn_download: "Descargar v0.4.0 Gratis",
+        hero_btn_quickstart: "Guía Rápida de Uso",
+        hero_supported_label: "Compatible con:",
+        tab_telemetry: "Telemetría y Delta",
+        tab_hud: "HUD Pedales (X11)",
+        tab_corner: "Análisis por Curvas",
+        tab_sessions: "Espacio de Sesiones",
+        features_tag: "ARQUITECTURA Y FUNCIONAMIENTO REAL",
+        features_title: "Qué hace IdoRacing y cómo funciona exactamente",
+        features_subtitle: "Diseñado para simracers que quieren datos claros sin perder tiempo configurando proyectos complejos ni sobrecargar el ordenador mientras conducen.",
+        f1_title: "0% de carga en carrera (Go nativo)",
+        f1_desc: "En pista sólo corre el ejecutable compilado en Go (< 15MB RAM y 0% CPU). Sin Python, sin Node y sin navegadores en segundo plano mientras pilotas. Cero caídas de FPS o micro-stuttering.",
+        f2_title: "HUD de Pedales y Trail Braking",
+        f2_desc: "Osciloscopio flotante y ligero que dibuja el acelerador y el freno en tiempo real. Te indica si estás soltando el freno de forma progresiva (entre el 60% y el 10%) para meter el morro en el vértice.",
+        f3_title: "Luces de volante Moza en Linux",
+        f3_desc: "Comunica por puerto serie nativo (CDC-ACM) directamente con las bases Moza en Linux. Enciende los LEDs progresivos de RPM y destello de cambio sin necesidad de Pit House, SimHub ni Boxflat.",
+        f4_title: "Desglose de curva en 3 fases",
+        f4_desc: "Cada curva se separa objetivamente en frenada/aproximación, paso por vértice y salida. Sabrás al milímetro si la pérdida de tiempo se debe a frenar antes, a subviraje en apoyo o a tardar en dar gas.",
+        f5_title: "Pep: Avisos en pista y debrief",
+        f5_desc: "En pista emite clips cortos de radio a 250m de tus curvas más críticas. En el garaje, puede resumir los datos numéricos de tu stint con un modelo local (Ollama) o API remota si quieres feedback hablado.",
+        f6_title: "Tus datos se quedan en tu PC",
+        f6_desc: "Base de datos SQLite local en tu disco. Sin cuentas de usuario obligatorias, sin subir tus vueltas a servidores de terceros y 100% operativo sin conexión a internet.",
+        sims_tag: "SIMULADORES Y PROTOCOLOS",
+        sims_title: "Fidelidad técnica según cada juego",
+        sims_desc: "Nos conectamos directamente a la memoria compartida o sockets UDP oficiales de cada simulador, sin inventar datos mecánicos inexistentes.",
+        dl_title: "Descargas y Puesta en Marcha",
+        dl_desc: "Binarios precompilados de la última versión estable (v0.4.0) listos para usar sin necesidad de compilar código fuente.",
+        faq_title: "Preguntas Frecuentes",
+        faq_desc: "Respuestas transparentes sobre requisitos y limitaciones."
+      },
+      en: {
+        header_slogan: "Telemetry & Trackside Engineering · SimRacing",
+        nav_features: "Features",
+        nav_sims: "Simulators",
+        nav_hud: "Pedal HUD",
+        nav_download: "Downloads",
+        nav_faq: "FAQ",
+        hero_badge: "Open Source · Lightweight on Track · No Subscriptions",
+        hero_title_1: "Objective telemetry,",
+        hero_title_2: "corner phase breakdown and trackside assistance",
+        hero_desc: "Record 50Hz telemetry without hurting your simulator FPS. Analyze where you lose time in each corner phase (braking, apex, exit), practice progressive trail braking with a live HUD, and receive pit-wall audio cues.",
+        hero_btn_download: "Download v0.4.0 Free",
+        hero_btn_quickstart: "Quick Start Guide",
+        hero_supported_label: "Compatible with:",
+        tab_telemetry: "Telemetry & Delta",
+        tab_hud: "Pedal HUD (X11)",
+        tab_corner: "Corner Analysis",
+        tab_sessions: "Sessions Workspace",
+        features_tag: "REAL ARCHITECTURE & ENGINEERING",
+        features_title: "What IdoRacing does and how it actually works",
+        features_subtitle: "Built for simracers who want clear telemetry facts without wasting hours setting up complex software or overloading their PC during a stint.",
+        f1_title: "Zero overhead while racing (Pure Go)",
+        f1_desc: "On track, only the native compiled Go supervisor runs (< 15MB RAM, ~0% CPU). No Python, no Node, and no browsers running in the background. Zero FPS drops or micro-stuttering.",
+        f2_title: "Pedal HUD & Trail Braking",
+        f2_desc: "Lightweight floating oscilloscope displaying live throttle and brake traces. Visually confirms progressive brake release (decaying from 60% down to 10%) to rotate the car into the apex.",
+        f3_title: "Native Moza Shift Lights on Linux",
+        f3_desc: "Direct CDC-ACM serial communication with Moza wheelbases under Linux Proton. Powers progressive RPM LEDs and shift flashes without requiring Pit House, SimHub or virtual machines.",
+        f4_title: "Corner phase separation (3 phases)",
+        f4_desc: "Every corner is objectively split into braking/entry, apex, and exit acceleration. Spot immediately if laptime loss comes from early braking, mid-corner understeer, or delayed throttle pick-up.",
+        f5_title: "Pep: Trackside radio & debriefs",
+        f5_desc: "On track, short radio audio cues trigger 250m before your most critical corners. In the garage, debrief with a local LLM (Ollama) or remote API summarizing numerical telemetry metrics.",
+        f6_title: "Your data stays on your machine",
+        f6_desc: "Local SQLite database on disk. No mandatory user accounts, no uploading your laps to cloud servers, and 100% functional without an active internet connection.",
+        sims_tag: "SIMULATORS & PROTOCOLS",
+        sims_title: "Technical fidelity simulator by simulator",
+        sims_desc: "Direct integration with official shared memory pages and UDP sockets, with zero fabricated mechanical figures.",
+        dl_title: "Downloads & Quick Setup",
+        dl_desc: "Precompiled standalone binaries for the latest release (v0.4.0), ready to run without manual building.",
+        faq_title: "Frequently Asked Questions",
+        faq_desc: "Transparent answers about requirements, hardware, and performance."
+      }
+    };
+
+    function setLang(lang) {
+      currentLang = lang;
+      const dict = i18nTexts[lang];
+      if (!dict) return;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.innerText = dict[key];
+        }
+      });
+
+      // Update lang toggle buttons
+      const esBtn = document.getElementById('lang-es');
+      const enBtn = document.getElementById('lang-en');
+      if (lang === 'es') {
+        esBtn.className = 'px-2 py-0.5 rounded transition bg-brand/20 text-brand';
+        enBtn.className = 'px-2 py-0.5 rounded transition text-gray-400 hover:text-white';
+        document.documentElement.lang = 'es';
+      } else {
+        enBtn.className = 'px-2 py-0.5 rounded transition bg-brand/20 text-brand';
+        esBtn.className = 'px-2 py-0.5 rounded transition text-gray-400 hover:text-white';
+        document.documentElement.lang = 'en';
+      }
+
+      // Update caption of current screenshot
+      const caption = document.getElementById('screenshot-caption');
+      const tabData = screenshots[currentTab];
+      if (caption && tabData) {
+        caption.innerText = lang === 'en' ? tabData.caption_en : tabData.caption_es;
+      }
+    }
+
+    function copyLaunchCommand() {
+      const cmd = "gamemoderun /path/to/idoracing/recorder/bin/idoracing-launcher %command%";
+      navigator.clipboard.writeText(cmd).then(() => {
+        const text = document.getElementById('copy-text');
+        text.innerText = currentLang === 'en' ? 'Copied!' : '¡Copiado!';
+        setTimeout(() => {
+          text.innerText = currentLang === 'en' ? 'Copy' : 'Copiar';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
